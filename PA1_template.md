@@ -3,14 +3,16 @@ title: "Pedometer Analysis : Assessment 1"
 author: "Abhishek Singh"
 keep_md: true
 ---
-```{r results="hide",message=FALSE, warning=FALSE}
+
+```r
 library(lattice)
 library(mice)
 ```
 
 ## Loading and preprocessing the data
 Data is loaded from the provided URL, the code checks for pre-existing files and if not found, it is downloaded and unzipped.Then the unzipped file is loaded into an object and date is converted from string to POSIXlt object
-```{r}
+
+```r
 zipName<-"Motion.zip"
 UnzipFile<-"activity.csv"
 DURL<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
@@ -27,43 +29,53 @@ steps$date<-as.Date(steps$date,"%Y-%m-%d")
 
 ## What is mean total number of steps taken per day?
 ##### 1. Calculate the total number of steps taken per day
-```{r}
+
+```r
 totSteps<-tapply(steps$steps,steps$date,sum,na.rm=TRUE)
 ```
 ##### 2. Calculate and report the mean and median of total number of steps taken per day  
-```{r}
+
+```r
 MeanStepsPerDay<-mean(totSteps)
 MedianStepsPerDay<-median(totSteps)
-```  
-* Mean= `r MeanStepsPerDay`  
-* Median= `r MedianStepsPerDay`     
+```
+* Mean= 9354.2295082  
+* Median= 10395     
 
 ##### 3. Make a histogram of the total number of steps taken each day
 
-```{r fig.width=6, fig.height=6}
+
+```r
 hist(totSteps,xlab="Total Steps per day",col="red",main="Total Steps per day")
 abline(v=MeanStepsPerDay,col="blue")
 abline(v=MedianStepsPerDay,col="green")
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
 
 ## What is the average daily activity pattern?
 ##### 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r}
+
+```r
 totStepsInInterval<-tapply(steps$steps,steps$interval,mean,na.rm=TRUE)
 ```
-```{r fig.width=6, fig.height=6}
+
+```r
 plot(totStepsInInterval,type="l",col="red",xlab="5-min Interval", 
       ylab="Daily average of Steps",main="Daily Activity Pattern")
 abline(h=mean(totStepsInInterval),col="blue")
 abline(h=median(totStepsInInterval),col="green")
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
   
 ##### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r}
+
+```r
 maxInt<-names(which.max(totStepsInInterval))
-````  
-* Max value interval=`r maxInt`
+```
+* Max value interval=835
 
 ## Imputing missing values
 The imputation is done using mice package for R using the predictive mean matching method  
@@ -71,24 +83,28 @@ The imputation is done using mice package for R using the predictive mean matchi
 * helpful read : http://www.r-bloggers.com/imputing-missing-data-with-r-mice-package/  
 
 ##### 1.Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r}
+
+```r
 misValues<-nrow(steps[!is.na(steps$steps),])
-````
+```
 ##### 2.Devise a strategy for filling in all of the missing values in the dataset.
-```{r results="hide"}
+
+```r
 impData<-steps
 tempData<-impData
 tempData$date<-as.numeric(impData$date)
 invisible(tempData<-mice(tempData,method="pmm"))
 ```
 ##### 3.Create a new dataset that is equal to the original dataset but with the missing data filled in
-```{r}
+
+```r
 impData<-complete(tempData,5)
 rm(tempData)
 impData$date<-steps$date
 ```
 ##### 4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day
-```{r fig.width=6, fig.height=6}
+
+```r
 itotSteps<-tapply(impData$steps,impData$date,sum,na.rm=TRUE)
 iMeanStepsPerDay<-mean(itotSteps)
 iMedianStepsPerDay<-median(itotSteps)
@@ -98,16 +114,19 @@ abline(v=iMeanStepsPerDay,col="blue")
 abline(v=iMedianStepsPerDay,col="green")
 ```
 
-* Mean with imputed data=`r iMeanStepsPerDay`  
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
-* Median with imputed data= `r iMedianStepsPerDay`
+* Mean with imputed data=1.0784377 &times; 10<sup>4</sup>  
 
-* Difference in mean after imputatuion= `r iMeanStepsPerDay-MeanStepsPerDay` 
+* Median with imputed data= 10600
 
-* Difference in median after imputation = `r iMedianStepsPerDay-MedianStepsPerDay`  
+* Difference in mean after imputatuion= 1430.147541 
+
+* Difference in median after imputation = 205  
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 impData$Dtype<-ifelse(weekdays(impData$date) %in% c("Saturday","Sunday"),
                       "weekend","weekday")
 impData$Dtype<-as.factor(impData$Dtype)
@@ -115,3 +134,5 @@ WimpData<-aggregate(steps~Dtype+interval,impData,mean)
 xyplot(WimpData$steps~WimpData$interval|WimpData$Dtype,type="l",xlab="Interval",
         ylab="Average of steps over days")
 ```
+
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
