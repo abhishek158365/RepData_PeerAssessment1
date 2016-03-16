@@ -85,8 +85,11 @@ The imputation is done using mice package for R using the predictive mean matchi
 ##### 1.Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
 ```r
-misValues<-nrow(steps[!is.na(steps$steps),])
+misValues<-nrow(steps[is.na(steps$steps),])
 ```
+  
+* Missing Values= 2304  
+
 ##### 2.Devise a strategy for filling in all of the missing values in the dataset.
 
 ```r
@@ -116,13 +119,13 @@ abline(v=iMedianStepsPerDay,col="green")
 
 ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
-* Mean with imputed data=1.0784377 &times; 10<sup>4</sup>  
+* Mean with imputed data=1.1210574 &times; 10<sup>4</sup>  
 
-* Median with imputed data= 10600
+* Median with imputed data= 11352
 
-* Difference in mean after imputatuion= 1430.147541 
+* Difference in mean after imputatuion= 1856.3442623 
 
-* Difference in median after imputation = 205  
+* Difference in median after imputation = 957  
 
 ## Are there differences in activity patterns between weekdays and weekends?
 

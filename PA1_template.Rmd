@@ -72,8 +72,11 @@ The imputation is done using mice package for R using the predictive mean matchi
 
 ##### 1.Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 ```{r}
-misValues<-nrow(steps[!is.na(steps$steps),])
-````
+misValues<-nrow(steps[is.na(steps$steps),])
+````  
+  
+* Missing Values= `r misValues`  
+
 ##### 2.Devise a strategy for filling in all of the missing values in the dataset.
 ```{r results="hide"}
 impData<-steps
